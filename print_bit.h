@@ -28,6 +28,7 @@ void set_scale_decimal(s21_decimal *ptr_decimal, unsigned scale);
 void clear_sign_decimal(s21_decimal *ptr_decimal);
 void print_index_decimal(void);
 void print_bit_decimal(s21_decimal decimal);
+void print_decimal_init(s21_decimal decimal);
 int from_binstr_to_decimal(char *binstr, s21_decimal *dst);
 /*----------------------^ s21_decimal ^----------------------*/
 

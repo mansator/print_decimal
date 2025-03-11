@@ -11,6 +11,7 @@ int main() {
   set_sign_decimal(&d);
   set_scale_decimal(&d, 5);
   print_bit_decimal(d);
+  print_decimal_init(d);
   
   return 0;
 }

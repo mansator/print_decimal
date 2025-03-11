@@ -248,4 +248,17 @@ int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
   return error;
 }
 
+/**
+ * Печатает строку в виде инициализации структуры для языка Си
+ * @param decimal
+ * @return 1 - некорректная строка; 0 - ОК
+ */
+void print_decimal_init(s21_decimal decimal) {
+  printf("{{%u, %u, %u, %u}}\n",
+    decimal.bits[0],
+    decimal.bits[1],
+    decimal.bits[2],
+    decimal.bits[3]);
+}
+
 /*----------------------^ s21_decimal ^----------------------*/
