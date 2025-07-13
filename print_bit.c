@@ -4,7 +4,7 @@
 /*--------------------------v int v--------------------------*/
 
 /**
- * Проверяет бит по индексу i в переменной value типа int
+ * Проверяет бит по индексу index в переменной value типа int
  * @param value
  * @param index
  * @return 1 - бит установлен; 0 - бит не установлен
@@ -15,7 +15,7 @@ unsigned get_bit_int(unsigned value, unsigned index) {
 }
 
 /**
- * Печатает содержимое переменной int в бинарном виде с пробелами
+ * Печатает содержимое переменной value в бинарном виде с пробелами
  * @param value
  */
 void print_binary_int(unsigned value) {
