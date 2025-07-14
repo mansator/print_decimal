@@ -7,7 +7,15 @@ int main() {
   // demo_print_bit_decimal();
   // demo_print_bit_float();
   demo_print_bit_int();
+  // demo_print_decimal();
   return 0;
+}
+
+void demo_print_decimal() {
+  s21_decimal d = {{5, 0, 0, 0}};
+  set_sign_decimal(&d);
+  set_scale_decimal(&d, 2);
+  print_decimal(d);
 }
 
 void demo_print_bit_int() {
@@ -28,5 +36,5 @@ void demo_print_bit_decimal() {
   set_sign_decimal(&d);
   set_scale_decimal(&d, 5);
   print_bit_decimal(d);
-  print_decimal_init(d);
+  print_decimal_init_unsigned(d);
 }

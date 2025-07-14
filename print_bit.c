@@ -108,7 +108,7 @@ void print_index_decimal(void) {
 }
 
 /**
- * Проверяет бит
+ * Проверяет бит в s21_decimal
  * @return 1 есть бит 0 нет бита
  */
 unsigned get_bit_decimal(const s21_decimal *ptr_decimal, int index) {
@@ -159,16 +159,25 @@ void clear_sign_decimal(s21_decimal *ptr_decimal) {
   set_bit_decimal(ptr_decimal, 127, 0);
 }
 
+/**
+ * Узнает знак s21_decimal
+ * @param ptr_decimal указатель на s21_decimal
+ * @return 1, если число отрицательное
+ */
 unsigned get_sign_decimal(const s21_decimal *ptr_decimal) {
   return get_bit_int(ptr_decimal->bits[3], 31);
 }
 
+/**
+ * Устанавливает знак в s21_decimal
+ * @param ptr_decimal указатель на s21_decimal
+ */
 void set_sign_decimal(s21_decimal *ptr_decimal) {
   set_bit_int(&(ptr_decimal->bits[3]), 31, 1);
 }
 
 /**
- * Получает степень s21_decimal без проверки на адекватность
+ * Получает степень s21_decimal без валидации
  * @return int степень числа
  */
 unsigned get_scale_decimal(s21_decimal decimal) {
@@ -177,7 +186,7 @@ unsigned get_scale_decimal(s21_decimal decimal) {
 }
 
 /**
- * Устанавливаем показатель степени от 0 до 28
+ * Устанавливает показатель степени. Диапазон от 0 до 28
  */
 void set_scale_decimal(s21_decimal *ptr_decimal, unsigned scale) {
   unsigned sign = get_sign_decimal(ptr_decimal);
@@ -250,15 +259,111 @@ int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
 
 /**
  * Печатает строку в виде инициализации структуры для языка Си
+ * в беззнаковом формате чисел
  * @param decimal
  * @return 1 - некорректная строка; 0 - ОК
  */
-void print_decimal_init(s21_decimal decimal) {
+void print_decimal_init_unsigned(s21_decimal decimal) {
   printf("{{%u, %u, %u, %u}}\n",
     decimal.bits[0],
     decimal.bits[1],
     decimal.bits[2],
     decimal.bits[3]);
+}
+
+/**
+ * Печатает строку в виде инициализации структуры для языка Си
+ * в знаковом формате чисел
+ * @param decimal
+ * @return 1 - некорректная строка; 0 - ОК
+ */
+void print_decimal_init_signed(s21_decimal decimal) {
+  printf("{{%d, %d, %d, %d}}\n",
+    decimal.bits[0],
+    decimal.bits[1],
+    decimal.bits[2],
+    decimal.bits[3]);
+}
+
+/**
+ * Прибавляет единицу к decimal_digits
+ * @param dd - указатель на объект decimal_digits
+ */
+void add_1_to_digits(decimal_digits *dd) {
+  int carry = 1;
+  for (int i = 0; i < dd->length && carry > 0; ++i) {
+    int temp = dd->digits[i] + carry;
+    dd->digits[i] = temp % 10;
+    carry = temp / 10;
+  }
+  if (carry > 0) {
+    dd->digits[dd->length++] = carry;
+  }
+}
+
+/**
+ * Умножает decimal_digits на 2
+ * @param dd - указатель на объект decimal_digits
+ */
+void multiply_digits_by_2(decimal_digits *dd) {
+  int carry = 0;
+  for (int i = 0; i < dd->length; ++i) {
+    int temp = dd->digits[i] * 2 + carry;
+    dd->digits[i] = temp % 10;
+    carry = temp / 10;
+  }
+  if (carry > 0) {
+    dd->digits[dd->length++] = carry;
+  }
+}
+ 
+/**
+ * Присваивает ноль в decimal_digits
+ * @param dd - указатель на объект decimal_digits
+ */
+void clear_decimal_digits(decimal_digits *dd) {
+  memset(dd->digits, 0, sizeof(dd->digits));
+  dd->length = 1;
+}
+
+/**
+ * Печатает s21_decimal в десятичном виде
+ * @param decimal
+ */
+void print_decimal(s21_decimal decimal) {
+  decimal_digits dd;
+  clear_decimal_digits(&dd);
+
+  // Перевод из двоичного вида s21_decimal в массив десятичных цифр
+  for (int i = 95; i >= 0; i--) {
+    multiply_digits_by_2(&dd);
+    if (get_bit_decimal(&decimal, i)) {
+      add_1_to_digits(&dd);
+    }
+  }
+
+  int scale = get_scale_decimal(decimal);
+  int leading_zeros = scale - dd.length + 1;
+  bool need_dot = scale > 0 ? true : false;
+
+  if (get_sign_decimal(&decimal)) {
+    printf("%c", '-');
+  }
+  while (leading_zeros > 0) {
+    printf("%c", '0');
+    if (need_dot) {
+      printf("%c", '.');
+      need_dot = false;
+    }
+    leading_zeros--;
+  }
+  for (int i = dd.length - 1; i >= 0; --i) {
+    if (i + 1 == scale && need_dot) {
+      printf("%c", '.');
+    }
+    printf("%d", dd.digits[i]);
+  }
+  printf("\n");
 }
 
 /*----------------------^ s21_decimal ^----------------------*/
