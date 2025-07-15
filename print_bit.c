@@ -1,8 +1,5 @@
 #include "print_bit.h"
 
-/*-------------------------v float v-------------------------*/
-/*--------------------------v int v--------------------------*/
-
 /**
  * Проверяет бит по индексу index в переменной value типа int
  * @param value
@@ -21,7 +18,7 @@ unsigned get_bit_int(unsigned value, unsigned index) {
 void print_binary_int(unsigned value) {
   for (int i = 31; i >= 0; --i) {
     if (get_bit_int(value, i)) {
-      printf("%3d", 1);
+      printf("%s%3d%s", "\033[1;33m", 1, "\033[1;0m");
     } else {
       printf("%3d", 0);
     }
@@ -38,7 +35,7 @@ void print_index_32(void) {
 }
 
 /**
- * Печатает биты, содержащиеся в int в подробном виде
+ * Печатает биты, содержащиеся в переменной типа int в подробном виде
  * @param value
  */
 void print_bit_int(unsigned value) {
@@ -50,10 +47,8 @@ void print_bit_int(unsigned value) {
   printf("  <- value\n");
 }
 
-/*--------------------------^ int ^--------------------------*/
-
 /**
- * Печатает биты, содержащиеся в float в подробном виде
+ * Печатает биты, содержащиеся в переменной типа float в подробном виде
  * @param num
  */
 void print_bit_float(float value) {
@@ -71,27 +66,22 @@ void print_bit_float(float value) {
   printf("  <- value\n");
 }
 
-/*-------------------------^ float ^-------------------------*/
-
-/*----------------------v s21_decimal v----------------------*/
-
 /**
  * Печатает индексы битов для 128-битных переменных.
- * Используется для четырёх последовательных вызовов.
+ * Используется для четырёх последовательных вызовов
  */
-void print_index_decimal(void) {
+void print_index_128(void) {
   static int index = 127;
   if (index == -1) {
     index = 127;
   }
-  int index_support = 0;
 
-  for (; index >= 0; --index) {
+  for (int index_support = 0; index >= 0; --index) {
     index_support = index;
     if (index % 32) {
       if (index > 99) {
         index_support -= 100;
-        if (110 > index) {
+        if (index < 110) {
           printf("|0%d", index_support);
         } else {
           printf("|%2d", index_support);
@@ -108,16 +98,18 @@ void print_index_decimal(void) {
 }
 
 /**
- * Проверяет бит в s21_decimal
- * @return 1 есть бит 0 нет бита
+ * Проверяет бит по индексу index в переменной value типа s21_decimal
+ * @param value
+ * @param index
+ * @return 1 - бит установлен; 0 - бит не установлен
  */
-unsigned get_bit_decimal(const s21_decimal *ptr_decimal, int index) {
+unsigned get_bit_decimal(s21_decimal value, int index) {
   unsigned mask = 0;
   unsigned i = index / 32;      // индекс нужного int'а в decimal
   unsigned shift = index % 32;  // индекс бита в int'е (величина сдвига)
 
   mask = 1u << shift;
-  return (ptr_decimal->bits[i] & mask) != 0;
+  return (value.bits[i] & mask) != 0;
 }
 
 /**
@@ -145,10 +137,10 @@ void set_bit_int(unsigned *ptr_int, unsigned index, unsigned bit) {
  */
 void set_bit_decimal(s21_decimal *ptr_decimal, unsigned index, unsigned bit) {
   unsigned mask = 0;
-  unsigned i = index / 32;      // индекс нужного int'а в decimal
-  unsigned shift = index % 32;  // индекс бита в int'е (величина сдвига)
+  unsigned i = index / 32;          // индекс нужного int'а в decimal
+  unsigned int_index = index % 32;  // индекс бита в int'е (величина сдвига)
 
-  set_bit_int(&(ptr_decimal->bits[i]), shift, bit);
+  set_bit_int(&(ptr_decimal->bits[i]), int_index, bit);
 }
 
 /**
@@ -160,12 +152,12 @@ void clear_sign_decimal(s21_decimal *ptr_decimal) {
 }
 
 /**
- * Узнает знак s21_decimal
- * @param ptr_decimal указатель на s21_decimal
+ * Проверяет знак в s21_decimal
+ * @param value число s21_decimal
  * @return 1, если число отрицательное
  */
-unsigned get_sign_decimal(const s21_decimal *ptr_decimal) {
-  return get_bit_int(ptr_decimal->bits[3], 31);
+unsigned get_sign_decimal(s21_decimal value) {
+  return get_bit_int(value.bits[3], 31);
 }
 
 /**
@@ -186,10 +178,13 @@ unsigned get_scale_decimal(s21_decimal decimal) {
 }
 
 /**
- * Устанавливает показатель степени. Диапазон от 0 до 28
+ * Устанавливает коэффициент масштаба s21_decimal.
+ * Диапазон от 0 до 28
+ * @param ptr_decimal указатель на s21_decimal
+ * @param scale коэффициент масштаба
  */
 void set_scale_decimal(s21_decimal *ptr_decimal, unsigned scale) {
-  unsigned sign = get_sign_decimal(ptr_decimal);
+  unsigned sign = get_sign_decimal(*ptr_decimal);
 
   ptr_decimal->bits[3] = scale;
   ptr_decimal->bits[3] <<= 16;
@@ -204,11 +199,11 @@ void set_scale_decimal(s21_decimal *ptr_decimal, unsigned scale) {
  * @param number
  */
 void print_bit_decimal(s21_decimal decimal) {
-  char char_sign = (get_sign_decimal(&decimal)) ? '-' : '+';
+  char char_sign = (get_sign_decimal(decimal)) ? '-' : '+';
   char *str_sign = (char_sign == '+') ? "positive" : "negative";
   unsigned int scale = get_scale_decimal(decimal);
   for (int i = 3; i >= 0; --i) {
-    print_index_decimal();
+    print_index_128();
     printf("  <- index\n");
     print_binary_int(decimal.bits[i]);
     printf("  <- bit\n");
@@ -216,7 +211,7 @@ void print_bit_decimal(s21_decimal decimal) {
       printf(
           " '%c' <- sign (%s) %8s |<- scale:%2d ->|"
           "%24s bits[%d] = [%10u]  <- int value\n",
-          char_sign, str_sign, "", scale, "", i, decimal.bits[i]);      
+          char_sign, str_sign, "", scale, "", i, decimal.bits[i]);
     } else {
       printf("%73s bits[%d] = [%10u]  <- int value\n", "", i, decimal.bits[i]);
     }
@@ -225,8 +220,9 @@ void print_bit_decimal(s21_decimal decimal) {
 
 /**
  * Переводит строку, содержащее число в бинароном виде, в s21_decimal
- * @param binstr
- * @param dst
+ * @param binstr - строка содержащая число в бинарном виде "10101",
+ *                 длиной до 128 символов
+ * @param dst - указатель на s21_decimal
  * @return 1 - некорректная строка; 0 - ОК
  */
 int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
@@ -238,7 +234,9 @@ int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
   dst->bits[2] = 0;
   dst->bits[3] = 0;
 
-  if (n < 128) {
+  if (n > 128) {
+    error = 1;
+  } else {
     for (; n >= 0; n--, i++) {
       if (binstr[n] == '0') {
         set_bit_decimal(dst, i, 0);
@@ -251,8 +249,6 @@ int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
     for (; c < 128; ++c) {
       set_bit_decimal(dst, c, 0);
     }
-  } else {
-    error = 1;
   }
   return error;
 }
@@ -261,69 +257,61 @@ int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
  * Печатает строку в виде инициализации структуры для языка Си
  * в беззнаковом формате чисел
  * @param decimal
- * @return 1 - некорректная строка; 0 - ОК
  */
 void print_decimal_init_unsigned(s21_decimal decimal) {
-  printf("{{%u, %u, %u, %u}}\n",
-    decimal.bits[0],
-    decimal.bits[1],
-    decimal.bits[2],
-    decimal.bits[3]);
+  printf("{{%u, %u, %u, %u}}\n", decimal.bits[0], decimal.bits[1],
+         decimal.bits[2], decimal.bits[3]);
 }
 
 /**
  * Печатает строку в виде инициализации структуры для языка Си
  * в знаковом формате чисел
  * @param decimal
- * @return 1 - некорректная строка; 0 - ОК
  */
 void print_decimal_init_signed(s21_decimal decimal) {
-  printf("{{%d, %d, %d, %d}}\n",
-    decimal.bits[0],
-    decimal.bits[1],
-    decimal.bits[2],
-    decimal.bits[3]);
+  printf("{{%d, %d, %d, %d}}\n", decimal.bits[0], decimal.bits[1],
+         decimal.bits[2], decimal.bits[3]);
 }
 
 /**
  * Прибавляет единицу к decimal_digits
- * @param dd - указатель на объект decimal_digits
+ * @param ptr_digits - указатель на объект decimal_digits
  */
-void add_1_to_digits(decimal_digits *dd) {
+void add_1_to_digits(decimal_digits *ptr_digits) {
   int carry = 1;
-  for (int i = 0; i < dd->length && carry > 0; ++i) {
-    int temp = dd->digits[i] + carry;
-    dd->digits[i] = temp % 10;
+  for (int i = 0; i < ptr_digits->length && carry > 0; ++i) {
+    int temp = ptr_digits->digits[i] + carry;
+    ptr_digits->digits[i] = temp % 10;
     carry = temp / 10;
   }
   if (carry > 0) {
-    dd->digits[dd->length++] = carry;
+    ptr_digits->digits[ptr_digits->length++] = carry;
   }
 }
 
 /**
  * Умножает decimal_digits на 2
- * @param dd - указатель на объект decimal_digits
+ * @param ptr_digits - указатель на объект decimal_digits
  */
-void multiply_digits_by_2(decimal_digits *dd) {
+void multiply_digits_by_2(decimal_digits *ptr_digits) {
   int carry = 0;
-  for (int i = 0; i < dd->length; ++i) {
-    int temp = dd->digits[i] * 2 + carry;
-    dd->digits[i] = temp % 10;
+  for (int i = 0; i < ptr_digits->length; ++i) {
+    int temp = ptr_digits->digits[i] * 2 + carry;
+    ptr_digits->digits[i] = temp % 10;
     carry = temp / 10;
   }
   if (carry > 0) {
-    dd->digits[dd->length++] = carry;
+    ptr_digits->digits[ptr_digits->length++] = carry;
   }
 }
- 
+
 /**
  * Присваивает ноль в decimal_digits
- * @param dd - указатель на объект decimal_digits
+ * @param ptr_digits - указатель на объект decimal_digits
  */
-void clear_decimal_digits(decimal_digits *dd) {
-  memset(dd->digits, 0, sizeof(dd->digits));
-  dd->length = 1;
+void clear_decimal_digits(decimal_digits *ptr_digits) {
+  memset(ptr_digits->digits, 0, sizeof(ptr_digits->digits));
+  ptr_digits->length = 1;
 }
 
 /**
@@ -337,7 +325,7 @@ void print_decimal(s21_decimal decimal) {
   // Перевод из двоичного вида s21_decimal в массив десятичных цифр
   for (int i = 95; i >= 0; i--) {
     multiply_digits_by_2(&dd);
-    if (get_bit_decimal(&decimal, i)) {
+    if (get_bit_decimal(decimal, i)) {
       add_1_to_digits(&dd);
     }
   }
@@ -346,7 +334,7 @@ void print_decimal(s21_decimal decimal) {
   int leading_zeros = scale - dd.length + 1;
   bool need_dot = scale > 0 ? true : false;
 
-  if (get_sign_decimal(&decimal)) {
+  if (get_sign_decimal(decimal)) {
     printf("%c", '-');
   }
   while (leading_zeros > 0) {
@@ -365,5 +353,3 @@ void print_decimal(s21_decimal decimal) {
   }
   printf("\n");
 }
-
-/*----------------------^ s21_decimal ^----------------------*/
