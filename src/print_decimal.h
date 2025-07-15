@@ -1,7 +1,7 @@
 /* Copyright (c) 2025 Tolstenev Gleb */
 
-/* This is set of functions to represent
- * the s21_decimal numbers in binary and decimal view
+/*
+ * print_decimal.h | The set of functions to represent the s21_decimal numbers
  */
 
 #ifndef PRINT_BIT_H
@@ -46,7 +46,7 @@ void print_index_128(void);
 void print_bit_decimal(s21_decimal decimal);
 void print_decimal_init_signed(s21_decimal decimal);
 void print_decimal_init_unsigned(s21_decimal decimal);
-int from_binstr_to_decimal(char *binstr, s21_decimal *dst);
+int binstr_to_decimal(char *binstr, s21_decimal *dst);
 
 void add_1_to_digits(decimal_digits *ptr_digits);
 void multiply_digits_by_2(decimal_digits *ptr_digits);

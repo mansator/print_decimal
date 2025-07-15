@@ -1,4 +1,10 @@
+/* Copyright (c) 2025 Tolstenev Gleb */
+
 #include "print_decimal.h"
+
+/*
+ * print_decimal.c | The set of functions to represent the s21_decimal numbers
+ */
 
 /**
  * Проверяет бит по индексу index в переменной value типа int
@@ -136,7 +142,6 @@ void set_bit_int(unsigned *ptr_int, unsigned index, unsigned bit) {
  * @param bit значение бита, которое нужно установить (0 или 1)
  */
 void set_bit_decimal(s21_decimal *ptr_decimal, unsigned index, unsigned bit) {
-  unsigned mask = 0;
   unsigned i = index / 32;          // индекс нужного int'а в decimal
   unsigned int_index = index % 32;  // индекс бита в int'е (величина сдвига)
 
@@ -225,7 +230,7 @@ void print_bit_decimal(s21_decimal decimal) {
  * @param dst - указатель на s21_decimal
  * @return 1 - некорректная строка; 0 - ОК
  */
-int from_binstr_to_decimal(char *binstr, s21_decimal *dst) {
+int binstr_to_decimal(char *binstr, s21_decimal *dst) {
   int error = 0;
   int n = strlen(binstr) - 1, c = n + 1, i = 0;
 

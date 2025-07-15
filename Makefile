@@ -1,17 +1,29 @@
+CC			:= gcc
+CFLAGS		:= -std=c11 -pedantic -Wall -Wextra -Werror
+
 NAME 		:= print_decimal
 SRC 		:= ./src/$(NAME).c
+OBJ 		:= ./obj/$(NAME).o
 
-DEMO 		:= demo
-DEMO_EXEC	:= $(DEMO).out
-DEMO_SRC 	:= ./demo/$(DEMO).c
+LIB_NAME	:= libprint_decimal.a
 
-all: $(DEMO_EXEC)
+DEMO_EXEC	:= demo.out
+DEMO_SRC 	:= ./demo/demo.c
 
-$(DEMO_EXEC): $(DEMO_SRC) $(SRC)
-	gcc $^ -o $@
+all: $(LIB_NAME)
+
+$(LIB_NAME): $(OBJ)
+	ar rcs $@ $<
+
+$(OBJ): $(SRC)
+	mkdir obj
+	$(CC) $(CFLAGS) -c $< -o $@
+
+demo: $(DEMO_SRC) $(LIB_NAME)
+	$(CC) $(CFLAGS) $^ -o $(DEMO_EXEC)
 	./$(DEMO_EXEC)
 
 clean:
-	rm -rf $(DEMO_EXEC)
+	rm -rf $(DEMO_EXEC) obj/
 
-.PHONY: all clean
+.PHONY: all demo clean
