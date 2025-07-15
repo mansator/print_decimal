@@ -1,4 +1,4 @@
-#include "print_bit.h"
+#include "print_decimal.h"
 
 /**
  * Проверяет бит по индексу index в переменной value типа int

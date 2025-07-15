@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 #include "demo.h"
-#include "print_bit.h"
 
 int main() {
   // demo_print_bit_decimal();

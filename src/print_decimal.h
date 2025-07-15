@@ -1,7 +1,11 @@
-/** LICENSE **/
+/* Copyright (c) 2025 Tolstenev Gleb */
 
-#ifndef PRINT_BIT
-#define PRINT_BIT
+/* This is set of functions to represent
+ * the s21_decimal numbers in binary and decimal view
+ */
+
+#ifndef PRINT_BIT_H
+#define PRINT_BIT_H
 
 #include <stdbool.h>
 #include <stdio.h>

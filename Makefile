@@ -1,14 +1,17 @@
-NAME 		:= print_bit
-SRC 		:= $(NAME).c
+NAME 		:= print_decimal
+SRC 		:= ./src/$(NAME).c
 
 DEMO 		:= demo
-DEMO_SRC 	:= $(DEMO).c
+DEMO_EXEC	:= $(DEMO).out
+DEMO_SRC 	:= ./demo/$(DEMO).c
 
-all: $(DEMO)
+all: $(DEMO_EXEC)
 
-$(DEMO): $(DEMO_SRC) $(SRC)
+$(DEMO_EXEC): $(DEMO_SRC) $(SRC)
 	gcc $^ -o $@
-	./$(DEMO)
+	./$(DEMO_EXEC)
 
 clean:
-	rm -rf $(DEMO)
+	rm -rf $(DEMO_EXEC)
+
+.PHONY: all clean
