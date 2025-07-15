@@ -24,6 +24,6 @@ demo: $(DEMO_SRC) $(LIB_NAME)
 	./$(DEMO_EXEC)
 
 clean:
-	rm -rf $(DEMO_EXEC) obj/
+	rm -rf $(DEMO_EXEC) $(LIB_NAME) obj/ 
 
 .PHONY: all demo clean
