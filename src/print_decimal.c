@@ -143,9 +143,9 @@ void set_bit_int(unsigned *ptr_int, unsigned index, unsigned bit) {
  */
 void set_bit_decimal(s21_decimal *ptr_decimal, unsigned index, unsigned bit) {
   unsigned i = index / 32;          // индекс нужного int'а в decimal
-  unsigned int_index = index % 32;  // индекс бита в int'е (величина сдвига)
+  unsigned bit_index = index % 32;  // индекс бита в int'е (величина сдвига)
 
-  set_bit_int(&(ptr_decimal->bits[i]), int_index, bit);
+  set_bit_int(&(ptr_decimal->bits[i]), bit_index, bit);
 }
 
 /**

@@ -4,8 +4,8 @@
  * print_decimal.h | The set of functions to represent the s21_decimal numbers
  */
 
-#ifndef PRINT_BIT_H
-#define PRINT_BIT_H
+#ifndef PRINT_DECIMAL_H
+#define PRINT_DECIMAL_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -53,4 +53,4 @@ void multiply_digits_by_2(decimal_digits *ptr_digits);
 void clear_decimal_digits(decimal_digits *ptr_digits);
 void print_decimal(s21_decimal decimal);
 
-#endif  // PRINT_BIT
+#endif  // PRINT_DECIMAL_H
